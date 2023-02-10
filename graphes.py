@@ -18,6 +18,7 @@ import config
 from config import Configuration
 from graphe_files import Lecture
 
+
 class Graphes:
     def __init__(self):
         """
@@ -31,6 +32,7 @@ class Graphes:
         self.duree = []
         self.contraintes = []
         self.onlyOneEntreeAndSortie = False
+        self.dontHaveCircuit = True
 
     def setTaskDureeContraintes(self, tache, duree, contraintes):
         """
@@ -46,37 +48,13 @@ class Graphes:
         """
         for element in self.grapheDict:
             if not element["contraintes"]:
-                element["type"] = "Entree"
+                element["isEntree"] = "Entree"
             isSortie = True
             for element2 in self.grapheDict:
                 if element["tache"] in element2["contraintes"]:
                     isSortie = False
             if isSortie:
-                element["type"] = "Sortie"
-
-
-    def checkEntreeSortie(self):
-        """
-        Vérifie si le graphe possède bien une entrée et une sortie
-        """
-        onlyOneEntree = 0
-        onlyOneSortie = 0
-        for element in self.grapheDict:
-            if element["type"] == "Entree":
-                onlyOneEntree += 1
-            if element["type"] == "Sortie":
-                onlyOneSortie += 1
-        if onlyOneEntree == 1 and onlyOneSortie == 1:
-            self.onlyOneEntreeAndSortie = True
-
-
-
-
-
-
-
-
-
+                element["isSortie"] = "Sortie"
 
     def setGrapheDict(self):
         """
@@ -86,17 +64,54 @@ class Graphes:
             self.grapheDict.append({"tache": self.tache[i],
                                     "duree": self.duree[i],
                                     "contraintes": self.contraintes[i],
-                                    "type": "",
-                                    "rang": 0})
+                                    "isEntree": "",
+                                    "isSortie": "",
+                                    "rang": ""})
+
+    def checkEntreeSortie(self):
+        """
+        Vérifie si le graphe possède bien une entrée et une sortie et retourne vrai s'il y a au moins une entrée
+        """
+        onlyOneEntree = 0
+        onlyOneSortie = 0
+        for element in self.grapheDict:
+            if element["isEntree"] == "Entree":
+                onlyOneEntree += 1
+            if element["isEntree"] == "Sortie":
+                onlyOneSortie += 1
+        if onlyOneEntree == 1 and onlyOneSortie == 1:
+            self.onlyOneEntreeAndSortie = True
+        elif onlyOneEntree >= 1:
+            return True
+        else:
+            return False
+
+    def checkCircuit(self):
+        """
+        Vérifie si le graphe possède un circuit
+        """
+        newGraphe = self.__copy__()
+        while newGraphe.checkEntreeSortie():
+            temp = []
+            for element in newGraphe.grapheDict:
+                if element["isEntree"] == "Entree":
+                    temp.append(element["tache"])
+                    newGraphe.grapheDict.remove(element)
+            for element in newGraphe.grapheDict:
+                for i in range(len(temp)):
+                    if temp[i] in element["contraintes"]:
+                        element["contraintes"].remove(temp[i])
+            newGraphe.setType()
+        print(newGraphe.grapheDict)
+        if newGraphe.grapheDict:
+            self.dontHaveCircuit = False
 
     # todo: faire la fonction qui renvoie la matrice des valeurs
     def getValueMatrix(self):
         """
         Renvoie la matrice des valeurs
         """
-        rows = []
-        columns = []
-        matrix = []
+        pass
 
     # todo : faire la fonction qui le rang de chaque tâche
     def setRang(self):
@@ -104,7 +119,7 @@ class Graphes:
         Set le rang de chaque tâche
         """
         pass
-    
+
     def __copy__(self):
         """
         Permet de copier un objet de la classe
@@ -117,7 +132,6 @@ class Graphes:
         return newGraphe
 
 
-
 if __name__ == '__main__':
     # Tests de la classe locale
     configuration = Configuration()
@@ -127,6 +141,9 @@ if __name__ == '__main__':
     graphe.setGrapheDict()
     graphe.setType()
     graphe.checkEntreeSortie()
-    for element in graphe.grapheDict:
-        print(element)
-    print(graphe.onlyOneEntreeAndSortie)
+    graphe.checkCircuit()
+    """for element in graphe.grapheDict:
+        print(element)"""
+    #print(graphe.onlyOneEntreeAndSortie)
+    print(graphe.dontHaveCircuit)
+    #print(graphe)
