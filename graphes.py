@@ -32,6 +32,14 @@ class Graphes:
         self.contraintes = []
         self.onlyOneEntreeAndSortie = False
         self.dontHaveCircuit = True
+        self.dontHaveNegativeDuration = True
+
+        self.setTaskDureeContraintes()
+        self.setGrapheDict()
+        self.setType()
+        self.setAlphaOmega()
+        self.checkNegativeDuration()
+
 
     def setTaskDureeContraintes(self):
         """
@@ -54,6 +62,30 @@ class Graphes:
                     isSortie = False
             if isSortie:
                 element["isSortie"] = "Sortie"
+
+    def setAlphaOmega(self):
+        """
+        Set l'entrée et la sortie du graphe
+        """
+        self.grapheDict = [{"tache": "α",  # ou "0"
+                            "duree": 0,
+                            "contraintes": [],
+                            "isEntree": "",
+                            "isSortie": "",
+                            "rang": 0}] + self.grapheDict
+        self.grapheDict.append({"tache": "ω",  # ou str(int(element["tache"]) + 1)
+                                "duree": 0,
+                                "contraintes": [],
+                                "isEntree": "",
+                                "isSortie": "",
+                                "rang": 0})
+
+        for element in self.grapheDict:
+            if element["isEntree"] == "Entree":
+                element["contraintes"].append("α") #ou "0"
+            if element["isSortie"] == "Sortie":
+                self.grapheDict[-1]["contraintes"].append(element["tache"])
+
 
     def setRang(self):
         """
@@ -94,32 +126,6 @@ class Graphes:
             k += 1
 
 
-
-
-
-
-
-
-    # todo: set l'entrée et la sortie du graphe alpha et omega
-    def setAlphaOmega(self):
-        """
-        Set l'entrée et la sortie du graphe
-        """
-        for element in self.grapheDict:
-            if element["isEntree"] == "Entree":
-                self.grapheDict.append({"tache": "0",
-                                        "duree": 0,
-                                        "contraintes": [element["tache"]],
-                                        "isEntree": "",
-                                        "isSortie": "",
-                                        "rang": 0})
-            if element["isSortie"] == "Sortie":
-                self.grapheDict.append({"tache": str(int(element["tache"]) + 1),
-                                        "duree": 0,
-                                        "contraintes": [],
-                                        "isEntree": "",
-                                        "isSortie": "",
-                                        "rang": 0})
 
 
 
@@ -172,14 +178,36 @@ class Graphes:
         if newGraphe.grapheDict:
             self.dontHaveCircuit = False
 
+    def checkNegativeDuration(self):
+        """
+        Vérifie si le graphe possède une tâche avec une durée négative
+        """
+        for element in self.grapheDict:
+            if int(element["duree"]) < 0:
+                self.dontHaveNegativeDuration = False
 
 
-    # todo: faire la fonction qui renvoie la matrice des valeurs
     def getValueMatrix(self):
         """
         Renvoie la matrice des valeurs
         """
-        pass
+
+        matrix = beautifultable.BeautifulTable()
+        for element in self.grapheDict:
+            temp = []
+            for element2 in self.grapheDict:
+                if element["tache"] in element2["contraintes"]:
+                    temp.append(element["tache"])
+                else:
+                    temp.append(" * ")
+            matrix.rows.append(temp)
+
+        headers = []
+        for element in self.grapheDict:
+            headers.append(" " + element["tache"] + " ")
+        matrix.columns.header = headers
+        matrix.rows.header = headers
+        return matrix
 
     def __copy__(self):
         """
@@ -196,15 +224,14 @@ class Graphes:
 if __name__ == '__main__':
     # Tests de la classe locale
     configuration = Configuration()
-    graphe = Graphes("test3.txt")
-    graphe.setTaskDureeContraintes()
-    graphe.setGrapheDict()
-    graphe.setType()
-    graphe.checkEntreeSortie()
+    graphe = Graphes("test5.txt")
+
     graphe.checkCircuit()
+
     graphe.setRang()
-    for element in graphe.grapheDict:
-        print(element)
+    graphes = graphe.getValueMatrix()
+    print(graphes)
+
     #print(graphe.onlyOneEntreeAndSortie)
     #print(graphe.dontHaveCircuit)
     #print(graphe)
