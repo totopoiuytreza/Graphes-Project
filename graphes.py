@@ -235,12 +235,27 @@ class Graphes:
                                     element["dateASAP"] = element2["dateASAP"] + int(element2["duree"])
             k += 1
 
-    #todo : faire la fonction
     def dateALAP(self):
         """
         Renvoie la date ALAP de chaque tâche
         """
-        pass
+        k = self.grapheDict[-1]["rang"]
+
+        for element in self.grapheDict:
+            element["dateALAP"] = self.grapheDict[-1]["dateASAP"]
+
+        while k >= 0:
+            for element in self.grapheDict:
+                if element["rang"] == k:
+                    if element["rang"] == self.grapheDict[-1]["rang"]:
+                        element["dateALAP"] = element["dateASAP"]
+                    else:
+                        for element2 in self.grapheDict:
+                            if element["tache"] in element2["contraintes"]:
+                                temp = element["dateALAP"]
+                                if temp > element2["dateALAP"] - int(element["duree"]):
+                                    element["dateALAP"] = element2["dateALAP"] - int(element["duree"])
+            k -= 1
 
 
     def __copy__(self):
@@ -264,6 +279,7 @@ if __name__ == '__main__':
 
     graphe.setRang()
     graphe.dateASAP()
+    graphe.dateALAP()
     graphes = graphe.getValueMatrix()
 
     for element in graphe.grapheDict:
