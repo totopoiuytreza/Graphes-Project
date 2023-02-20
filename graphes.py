@@ -75,7 +75,9 @@ class Graphes:
                             "isSortie": "",
                             "rang": 0,
                             "dateASAP": 0,
-                            "dateALAP": 0}] + self.grapheDict
+                            "dateALAP": 0,
+                            "marge": 0
+                            }] + self.grapheDict
         self.grapheDict.append({"tache": "ω",  # ou str(int(element["tache"]) + 1)
                                 "duree": 0,
                                 "contraintes": [],
@@ -83,7 +85,8 @@ class Graphes:
                                 "isSortie": "",
                                 "rang": 0,
                                 "dateASAP": 0,
-                                "dateALAP": 0
+                                "dateALAP": 0,
+                                "marge": 0
                                 })
 
         for element in self.grapheDict:
@@ -131,9 +134,53 @@ class Graphes:
                         element["contraintes"].remove(temp[i])
             k += 1
 
+    def setdateASAP(self):
+        """
+        Renvoie la date ASAP de chaque tâche
+        """
+        k = 0
+        while k <= self.grapheDict[-1]["rang"]:
+            for element in self.grapheDict:
+                if element["rang"] == k:
+                    if element["rang"] == 0:
+                        element["dateASAP"] = 0
+                    else:
+                        for element2 in self.grapheDict:
+                            if element2["tache"] in element["contraintes"]:
+                                temp = element["dateASAP"]
+                                if temp < element2["dateASAP"] + int(element2["duree"]):
+                                    element["dateASAP"] = element2["dateASAP"] + int(element2["duree"])
+            k += 1
+
+    def setdateALAP(self):
+        """
+        Renvoie la date ALAP de chaque tâche
+        """
+        k = self.grapheDict[-1]["rang"]
+
+        for element in self.grapheDict:
+            element["dateALAP"] = self.grapheDict[-1]["dateASAP"]
+
+        while k >= 0:
+            for element in self.grapheDict:
+                if element["rang"] == k:
+                    if element["rang"] == self.grapheDict[-1]["rang"]:
+                        element["dateALAP"] = element["dateASAP"]
+                    else:
+                        for element2 in self.grapheDict:
+                            if element["tache"] in element2["contraintes"]:
+                                temp = element["dateALAP"]
+                                if temp > element2["dateALAP"] - int(element["duree"]):
+                                    element["dateALAP"] = element2["dateALAP"] - int(element["duree"])
+            k -= 1
 
 
-
+    def setMarge(self):
+        """
+        Set la marge de chaque tâche
+        """
+        for element in self.grapheDict:
+            element["marge"] = element["dateALAP"] - element["dateASAP"]
 
     def setGrapheDict(self):
         """
@@ -147,7 +194,8 @@ class Graphes:
                                     "isSortie": "",
                                     "rang": 0,
                                     "dateASAP": 0,
-                                    "dateALAP": 0})
+                                    "dateALAP": 0,
+                                    "marge": 0})
 
     def checkEntreeSortie(self):
         """
@@ -217,45 +265,6 @@ class Graphes:
         matrix.rows.header = headers
         return matrix
 
-    def dateASAP(self):
-        """
-        Renvoie la date ASAP de chaque tâche
-        """
-        k = 0
-        while k <= self.grapheDict[-1]["rang"]:
-            for element in self.grapheDict:
-                if element["rang"] == k:
-                    if element["rang"] == 0:
-                        element["dateASAP"] = 0
-                    else:
-                        for element2 in self.grapheDict:
-                            if element2["tache"] in element["contraintes"]:
-                                temp = element["dateASAP"]
-                                if temp < element2["dateASAP"] + int(element2["duree"]):
-                                    element["dateASAP"] = element2["dateASAP"] + int(element2["duree"])
-            k += 1
-
-    def dateALAP(self):
-        """
-        Renvoie la date ALAP de chaque tâche
-        """
-        k = self.grapheDict[-1]["rang"]
-
-        for element in self.grapheDict:
-            element["dateALAP"] = self.grapheDict[-1]["dateASAP"]
-
-        while k >= 0:
-            for element in self.grapheDict:
-                if element["rang"] == k:
-                    if element["rang"] == self.grapheDict[-1]["rang"]:
-                        element["dateALAP"] = element["dateASAP"]
-                    else:
-                        for element2 in self.grapheDict:
-                            if element["tache"] in element2["contraintes"]:
-                                temp = element["dateALAP"]
-                                if temp > element2["dateALAP"] - int(element["duree"]):
-                                    element["dateALAP"] = element2["dateALAP"] - int(element["duree"])
-            k -= 1
 
 
     def __copy__(self):
@@ -278,8 +287,9 @@ if __name__ == '__main__':
     graphe.checkCircuit()
 
     graphe.setRang()
-    graphe.dateASAP()
-    graphe.dateALAP()
+    graphe.setdateASAP()
+    graphe.setdateALAP()
+    graphe.setMarge()
     graphes = graphe.getValueMatrix()
 
     for element in graphe.grapheDict:
