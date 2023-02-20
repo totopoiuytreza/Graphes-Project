@@ -6,7 +6,7 @@ Projet Théorie des graphes L3 EFREI
     - Thomas SONG
     -
 
-Classe principale de la gestion des Automates du projet
+Classe principale de la gestion des Graphes du projet
 """
 
 import os
@@ -41,6 +41,7 @@ class Graphes:
         self.checkNegativeDuration()
 
 
+
     def setTaskDureeContraintes(self):
         """
         Set les paramètres de la classe avec les valeurs stockés dans "self.lignes" dans "self.fichier"
@@ -72,13 +73,18 @@ class Graphes:
                             "contraintes": [],
                             "isEntree": "",
                             "isSortie": "",
-                            "rang": 0}] + self.grapheDict
+                            "rang": 0,
+                            "dateASAP": 0,
+                            "dateALAP": 0}] + self.grapheDict
         self.grapheDict.append({"tache": "ω",  # ou str(int(element["tache"]) + 1)
                                 "duree": 0,
                                 "contraintes": [],
                                 "isEntree": "",
                                 "isSortie": "",
-                                "rang": 0})
+                                "rang": 0,
+                                "dateASAP": 0,
+                                "dateALAP": 0
+                                })
 
         for element in self.grapheDict:
             if element["isEntree"] == "Entree":
@@ -139,7 +145,9 @@ class Graphes:
                                     "contraintes": self.contraintes[i],
                                     "isEntree": "",
                                     "isSortie": "",
-                                    "rang": 0})
+                                    "rang": 0,
+                                    "dateASAP": 0,
+                                    "dateALAP": 0})
 
     def checkEntreeSortie(self):
         """
@@ -209,6 +217,32 @@ class Graphes:
         matrix.rows.header = headers
         return matrix
 
+    def dateASAP(self):
+        """
+        Renvoie la date ASAP de chaque tâche
+        """
+        k = 0
+        while k <= self.grapheDict[-1]["rang"]:
+            for element in self.grapheDict:
+                if element["rang"] == k:
+                    if element["rang"] == 0:
+                        element["dateASAP"] = 0
+                    else:
+                        for element2 in self.grapheDict:
+                            if element2["tache"] in element["contraintes"]:
+                                temp = element["dateASAP"]
+                                if temp < element2["dateASAP"] + int(element2["duree"]):
+                                    element["dateASAP"] = element2["dateASAP"] + int(element2["duree"])
+            k += 1
+
+    #todo : faire la fonction
+    def dateALAP(self):
+        """
+        Renvoie la date ALAP de chaque tâche
+        """
+        pass
+
+
     def __copy__(self):
         """
         Permet de copier un objet de la classe
@@ -224,13 +258,16 @@ class Graphes:
 if __name__ == '__main__':
     # Tests de la classe locale
     configuration = Configuration()
-    graphe = Graphes("test5.txt")
+    graphe = Graphes("test6.txt")
 
     graphe.checkCircuit()
 
     graphe.setRang()
+    graphe.dateASAP()
     graphes = graphe.getValueMatrix()
-    print(graphes)
+
+    for element in graphe.grapheDict:
+        print(element)
 
     #print(graphe.onlyOneEntreeAndSortie)
     #print(graphe.dontHaveCircuit)

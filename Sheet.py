@@ -97,7 +97,7 @@ class Sheet:
         self.tableau_automate['columns'] = ()
         self.tableau_automate.delete(*self.tableau_automate.get_children())
 
-    def update_tableau(self, automate: Automate):
+    def update_tableau(self, graphe: Graphes):
         """
         Cette fonction redessine totalement la grille d'affichage de l'automate
 
@@ -108,7 +108,7 @@ class Sheet:
         self.efface_tableau()
 
         # On recrée totalement la grille en se basant sur la table de l'automate
-        self.table = automate.to_table()
+        self.table = graphe.to_table()
 
         # # Mise à jour de la nouvelle table
         self.init_colonne()
