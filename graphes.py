@@ -68,7 +68,7 @@ class Graphes:
         """
         Set l'entrée et la sortie du graphe
         """
-        self.grapheDict = [{"tache": "α",  # ou "0"
+        self.grapheDict = [{"tache": "0",  # ou "0"
                             "duree": 0,
                             "contraintes": [],
                             "isEntree": "",
@@ -78,7 +78,8 @@ class Graphes:
                             "dateALAP": 0,
                             "marge": 0
                             }] + self.grapheDict
-        self.grapheDict.append({"tache": "ω",  # ou str(int(element["tache"]) + 1)
+
+        self.grapheDict.append({"tache": str(int(self.grapheDict[-1]["tache"]) + 1),  # ou str(int(element["tache"]) + 1)
                                 "duree": 0,
                                 "contraintes": [],
                                 "isEntree": "",
@@ -91,7 +92,7 @@ class Graphes:
 
         for element in self.grapheDict:
             if element["isEntree"] == "Entree":
-                element["contraintes"].append("α") #ou "0"
+                element["contraintes"].append("0") #ou "0"
             if element["isSortie"] == "Sortie":
                 self.grapheDict[-1]["contraintes"].append(element["tache"])
 
@@ -265,6 +266,20 @@ class Graphes:
         matrix.rows.header = headers
         return matrix
 
+    def getCriticalPath(self):
+        """
+        Renvoie le chemin critique
+        """
+        temp = []
+        k = 0
+        while k <= self.grapheDict[-1]["rang"]:
+            for element in self.grapheDict:
+                if element["rang"] == k:
+                    if element["marge"] == 0:
+                        temp.append(element["tache"])
+            k += 1
+        return temp
+
 
 
     def __copy__(self):
@@ -292,8 +307,11 @@ if __name__ == '__main__':
     graphe.setMarge()
     graphes = graphe.getValueMatrix()
 
+    criticalPath = graphe.getCriticalPath()
     for element in graphe.grapheDict:
         print(element)
+
+    print(criticalPath)
 
     #print(graphe.onlyOneEntreeAndSortie)
     #print(graphe.dontHaveCircuit)
