@@ -25,7 +25,7 @@ class Graphes:
         :param fichier: Le nom du fichier à ouvrir dans le path par défaut trouvé dans les configurations.
         """
         self.config = Configuration()
-        self.fichier = Lecture(os.path.join(configuration.graphes_path, fichier))
+        self.fichier = Lecture(os.path.join(self.config.graphes_path, fichier))
         self.grapheDict = []
         self.tache = []
         self.duree = []
@@ -39,8 +39,6 @@ class Graphes:
         self.setType()
         self.setAlphaOmega()
         self.checkNegativeDuration()
-
-
 
     def setTaskDureeContraintes(self):
         """
@@ -79,23 +77,23 @@ class Graphes:
                             "marge": 0
                             }] + self.grapheDict
 
-        self.grapheDict.append({"tache": str(int(self.grapheDict[-1]["tache"]) + 1),  # ou str(int(element["tache"]) + 1)
-                                "duree": 0,
-                                "contraintes": [],
-                                "isEntree": "",
-                                "isSortie": "",
-                                "rang": 0,
-                                "dateASAP": 0,
-                                "dateALAP": 0,
-                                "marge": 0
-                                })
+        self.grapheDict.append(
+            {"tache": str(int(self.grapheDict[-1]["tache"]) + 1),  # ou str(int(element["tache"]) + 1)
+             "duree": 0,
+             "contraintes": [],
+             "isEntree": "",
+             "isSortie": "",
+             "rang": 0,
+             "dateASAP": 0,
+             "dateALAP": 0,
+             "marge": 0
+             })
 
         for element in self.grapheDict:
             if element["isEntree"] == "Entree":
-                element["contraintes"].append("0") #ou "0"
+                element["contraintes"].append("0")  # ou "0"
             if element["isSortie"] == "Sortie":
                 self.grapheDict[-1]["contraintes"].append(element["tache"])
-
 
     def setRang(self):
         """
@@ -107,7 +105,7 @@ class Graphes:
             howManyZeroInArc = 0
             temp = []
 
-            #Check combien il y a de 0 dans les arcs
+            # Check combien il y a de 0 dans les arcs
             for element in newGraphe.grapheDict:
                 if len(element["contraintes"]) == 0:
                     howManyZeroInArc += 1
@@ -174,7 +172,6 @@ class Graphes:
                                 if temp > element2["dateALAP"] - int(element["duree"]):
                                     element["dateALAP"] = element2["dateALAP"] - int(element["duree"])
             k -= 1
-
 
     def setMarge(self):
         """
@@ -243,7 +240,6 @@ class Graphes:
             if int(element["duree"]) < 0:
                 self.dontHaveNegativeDuration = False
 
-
     def getValueMatrix(self):
         """
         Renvoie la matrice des valeurs
@@ -266,19 +262,80 @@ class Graphes:
         matrix.rows.header = headers
         return matrix
 
+    # todo: faire la fonction qui renvoie les chemins critiques (plusieurs chemins possibles) => arbres
     def getCriticalPath(self):
         """
-        Renvoie le chemin critique
+        Renvoie le(s) chemin(s) critique(s)
         """
+        paths = []
         temp = []
+        #Get all the tasks with a margin of 0
+        for element in self.grapheDict:
+            if element["marge"] == 0:
+                temp.append(element["tache"])
+
+        dupe = self.checkDupeRank(temp)
+
+        if not dupe:
+            return self.findPath(temp)
+
+        while temp and dupe:
+            path = self.findPath(temp)
+            paths.append(path)
+
+            self.remove_path(path, temp, dupe)
+
+
+        return paths
+
+    def findPath(self, temp):
+        path = []
         k = 0
         while k <= self.grapheDict[-1]["rang"]:
             for element in self.grapheDict:
-                if element["rang"] == k:
-                    if element["marge"] == 0:
-                        temp.append(element["tache"])
+                if element["rang"] == k and element["tache"] in temp:
+                    path.append(element["tache"])
+                    break
             k += 1
-        return temp
+        return path
+    def getHighestRank(self, temp):
+        """
+        Renvoie le rang le plus haut
+        """
+        task = 0
+        stop_condition = 0
+        for i in range(len(temp)):
+            for element in self.grapheDict:
+                if element["tache"] == temp[i] and stop_condition < element["rang"]:
+                    stop_condition = element["rang"]
+                    task = element["tache"]
+        return stop_condition, task
+
+    def checkDupeRank(self, temp):
+        dupe_rank = []
+        for element in self.grapheDict:
+            if element["tache"] in temp:
+                dupe_rank.append(element["rang"])
+        dupe_rank = list(set([i for i in dupe_rank if dupe_rank.count(i) >= 2]))
+        return dupe_rank
+
+    def remove_path(self, path, temp, dupe):
+
+        highest_rank_task = self.getHighestRank(path)
+        while highest_rank_task[0] not in dupe:
+            highest_rank_task = self.getHighestRank(path)
+            for element in self.grapheDict:
+                if element["tache"] == highest_rank_task[1]:
+                    temp.remove(element["tache"])
+                    path.remove(element["tache"])
+
+        highest_rank_task = self.getHighestRank(path)
+        for element in self.grapheDict:
+            if element["tache"] == highest_rank_task[1]:
+                temp.remove(element["tache"])
+                path.remove(element["tache"])
+
+
 
 
 
@@ -296,7 +353,6 @@ class Graphes:
 
 if __name__ == '__main__':
     # Tests de la classe locale
-    configuration = Configuration()
     graphe = Graphes("test6.txt")
 
     graphe.checkCircuit()
@@ -308,11 +364,11 @@ if __name__ == '__main__':
     graphes = graphe.getValueMatrix()
 
     criticalPath = graphe.getCriticalPath()
-    for element in graphe.grapheDict:
-        print(element)
+    """for element in graphe.grapheDict:
+        print(element)"""
 
     print(criticalPath)
 
-    #print(graphe.onlyOneEntreeAndSortie)
-    #print(graphe.dontHaveCircuit)
-    #print(graphe)
+    # print(graphe.onlyOneEntreeAndSortie)
+    # print(graphe.dontHaveCircuit)
+    # print(graphe)
