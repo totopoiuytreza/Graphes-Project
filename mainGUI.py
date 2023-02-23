@@ -18,7 +18,7 @@ from tkinter import messagebox
 
 from graphes import Graphes
 from Sheet import Sheet
-from fonction_fichiers import retourne_liste_des_fichiers
+from visual_graphe import ToGraphviz
 from config import Configuration
 
 
@@ -242,7 +242,10 @@ class AppGraphe(tk.Tk):
         """
         Fonction permettant d'afficher le graphe
         """
-        pass
+        graph = ToGraphviz()
+        if graph.check:
+            print("Graphviz est installé")
+            print(graph.graphe_to_graph(self.graphe_courant, visualiser=True))
 
 
 

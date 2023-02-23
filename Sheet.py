@@ -6,7 +6,7 @@ Projet Théorie des graphes L3 EFREI
     - Thomas SONG
     -
 
-Cette classe permet de créer une table à la manière d'Excel pour afficher les automates
+Cette classe permet de créer une table à la manière d'Excel pour afficher les graphes
 """
 
 import re
