@@ -20,130 +20,187 @@ from graphes import Graphes
 
 class Sheet:
     """
-    Classe pour créer un tableau d'affichage des états et transitions d'un automate, dans le style excel.
+    Classe pour créer le tableau des variables du graphe
     """
 
     def __init__(self, frame: tk.Frame):
         self.master_frame = frame
-        self.tableau_automate = ttk.Treeview(self.master_frame)
+        self.style = ttk.Style(self.master_frame)
+        self.style.configure("Custom.Treeview", rowheight=20, font=('Helvetica', 10), bordercolor="black", borderwidth=1)
+        self.tableau_graphes = ttk.Treeview(self.master_frame, style="Custom.Treeview")
+        self.tableau_graphes.grid_propagate(False)
 
         # Création des scrollbars
-        scroll_y = tk.Scrollbar(self.master_frame, orient="vertical", command=self.tableau_automate.yview)
-        scroll_y.grid(row=0, column=1, sticky="ns")
+        scroll_y = tk.Scrollbar(self.master_frame, orient="vertical", command=self.tableau_graphes.yview)
+        scroll_y.grid(row=1, column=1, sticky="ns")
         scroll_y.update()
         self.scrollbar_width = scroll_y.winfo_reqwidth()
         self.width = 0
 
-        scroll_x = tk.Scrollbar(self.master_frame, orient="horizontal", command=self.tableau_automate.xview)
-        scroll_x.grid(row=1, column=0, sticky="ew")
-        # AutomateSheet scroll configuration
-        self.tableau_automate.configure(yscrollcommand=scroll_y.set,
-                                        xscrollcommand=scroll_x.set)
+        # GrapheSheet scroll configuration
+        self.tableau_graphes.configure(yscrollcommand=scroll_y.set)
         self.table = None
+
 
     def set_width(self, master_framesize: int):
         """
         Calcul de la taille de la frame, on se base sur une taille de la frame externe fournie en paramètre
-        
+
         :param master_framesize: Taille de la frame principale
         """
 
         self.width = master_framesize - self.scrollbar_width
 
+
     def set_lines(self, nbr_lignes: int):
         """
         Fonction qui fixe le nombre de lignes à afficher dans la liste.
-        
+
         :param nbr_lignes: Le nombre de lignes
         """
 
-        self.tableau_automate.configure(height=nbr_lignes)
+        self.tableau_graphes.configure(height=nbr_lignes)
 
     def init_colonne(self):
         """
         Création des colonnes de la table
         """
-
-        self.tableau_automate.configure(columns=self.table[0], show="headings")
+        self.tableau_graphes.configure(columns=self.table[0], show="headings")
+        self.init_en_tete()
 
     def init_en_tete(self):
         """
-        Créer la première ligne de la table (E/S Etats a b etc.)
+        Création des en-têtes de la table
+        """
+        self.tableau_graphes.heading("#0", text="", anchor=tk.CENTER)
+        for i in range(len(self.tableau_graphes["columns"])):
+            self.tableau_graphes.heading("#" + str(i + 1), text=self.tableau_graphes["columns"][i], anchor=tk.CENTER)
+
+    def remove_data(self):
+        """
+        Supprime les données de la table
+        """
+        self.tableau_graphes["columns"] = ()
+        self.tableau_graphes.delete(*self.tableau_graphes.get_children())
+
+    def set_data(self, graphes: Graphes):
+        """
+        Fonction qui permet de mettre à jour les données de la table
         """
 
-        # En-têtes des colonnes centrés
-        self.tableau_automate.heading("#0", text="", anchor=tk.CENTER)
-        for i in range(0, len(self.tableau_automate['columns'])):
-            self.tableau_automate.heading("#" + str(i + 1), text=self.tableau_automate['columns'][i])
+        self.remove_data()
 
-    def colonne_initiale(self):
-        """
-        Création du tableau initial
-        """
+        self.table = graphes.graphe_to_table
 
-        self.tableau_automate['columns'] = ("E / S", "Etats", "stretch")
-        self.tableau_automate.column("#0", width=0, stretch=tk.NO)
-        self.tableau_automate.column("E / S", anchor=tk.CENTER, width=60, stretch=False)
-        self.tableau_automate.column("Etats", anchor=tk.CENTER, width=60, stretch=False)
-        self.tableau_automate.column("stretch", anchor=tk.CENTER, width=60, stretch=False)
-        self.tableau_automate.heading("E / S", text="E / S", anchor=tk.CENTER)
-        self.tableau_automate.heading("Etats", text="Etats", anchor=tk.CENTER)
-
-    def efface_tableau(self):
-        """
-        Cette fonction permet d'effacer le tableau de l'automate
-        """
-
-        self.tableau_automate['columns'] = ()
-        self.tableau_automate.delete(*self.tableau_automate.get_children())
-
-    def update_tableau(self, graphe: Graphes):
-        """
-        Cette fonction redessine totalement la grille d'affichage de l'automate
-
-        :param automate: L'automate à afficher
-        """
-
-        # On commence par supprimer toutes les lignes et colonnes
-        self.efface_tableau()
-
-        # On recrée totalement la grille en se basant sur la table de l'automate
-        self.table = graphe.to_table()
-
-        # # Mise à jour de la nouvelle table
         self.init_colonne()
-        self.init_en_tete()
 
-        # Insertion des lignes dans la table
-        for index_ligne in range(1, len(self.table)):
-            self.tableau_automate.insert(parent='', index='end', text='', values=(self.table[index_ligne]))
+        for i in range(1, len(self.table)):
+            self.tableau_graphes.insert(parent="", index="end", values=self.table[i])
 
-        # Et on essaye de mettre les colonnes à une taille "adaptée"
-        sizes = self.retourne_taille_colonne(largeur_fonte=8, marge=25)
-        for index_colonne in range(0, len(self.tableau_automate['columns'])):
-            self.tableau_automate.column(f"#{index_colonne + 1}", width=sizes[index_colonne], stretch=False,
-                                         anchor=tk.CENTER)
+        for i in range(len(self.tableau_graphes["columns"])):
+            self.tableau_graphes.column("#" + str(i + 1), minwidth=25, stretch=True, anchor=tk.CENTER)
 
-    def retourne_taille_colonne(self, largeur_fonte: int, marge: int) -> dict:
+    def set_Rank(self, graphes: Graphes):
         """
-        Cette fonction essaye de déterminer la taille max, en pixels, de chaque colonne de la table à afficher
+        Fonction qui permet de mettre à jour les données de la table
+        """
+        temp = []
+        temp.append("Rang")
 
-        :param largeur_fonte: Largeur en pixel de la fonte utilisée pour l'affichage
-        :param marge: Marge en pixel à ajouter à chaque colonne
-        :return: Dictionnaire des tailles en pixel, les clés sont les numéros de colonne
+
+
+        i = 1
+        for element in graphes.grapheDict:
+            if int(element["tache"]) == int(self.table[0][i]):
+                temp.append(element["rang"])
+            i += 1
+        self.table.append(temp)
+        self.remove_data()
+
+        self.init_colonne()
+
+        for i in range(1, len(self.table)):
+            self.tableau_graphes.insert(parent="", index="end", values=self.table[i])
+
+        for i in range(len(self.tableau_graphes["columns"])):
+            self.tableau_graphes.column("#" + str(i + 1), minwidth=25, stretch=True, anchor=tk.CENTER)
+
+    def set_dateASAP(self, graphes: Graphes):
+        """
+        Fonction qui permet de mettre à jour les données de la table
         """
 
-        taille_colonne_min = marge
-        tailles = {}
-        # Pour chaque ligne à afficher
-        for index_ligne, row in enumerate(self.table):
-            # Et pour chaque colonne
-            for index_colonne, value in enumerate(self.table[index_ligne]):
-                # On calcule la largeur d'une colonne
-                taille = taille_colonne_min + (len(value) * largeur_fonte)
-                # Et on ajoute au dictionnaire {numero_colonne: taille}
-                if not tailles.get(index_colonne):
-                    tailles[index_colonne] = taille
-                if taille > tailles[index_colonne]:
-                    tailles[index_colonne] = taille
-        return tailles
+        temp = []
+        temp.append("ASAP")
+
+        i = 1
+        for element in graphes.grapheDict:
+            if int(element["tache"]) == int(self.table[0][i]):
+                temp.append(element["dateASAP"])
+            i += 1
+        self.table.append(temp)
+        self.remove_data()
+
+        self.init_colonne()
+
+        for i in range(1, len(self.table)):
+            self.tableau_graphes.insert(parent="", index="end", values=self.table[i])
+
+        for i in range(len(self.tableau_graphes["columns"])):
+            self.tableau_graphes.column("#" + str(i + 1), minwidth=25, stretch=True, anchor=tk.CENTER)
+
+    def set_dateALAP(self, graphes: Graphes):
+        """
+        Fonction qui permet de mettre à jour les données de la table
+        """
+
+        temp = []
+        temp.append("ALAP")
+
+        i = 1
+        for element in graphes.grapheDict:
+            if int(element["tache"]) == int(self.table[0][i]):
+                temp.append(element["dateALAP"])
+            i += 1
+
+        self.table.append(temp)
+        self.remove_data()
+
+        self.init_colonne()
+
+        for i in range(1, len(self.table)):
+            self.tableau_graphes.insert(parent="", index="end", values=self.table[i])
+
+        for i in range(len(self.tableau_graphes["columns"])):
+            self.tableau_graphes.column("#" + str(i + 1), minwidth=25, stretch=True, anchor=tk.CENTER)
+
+    def set_marge(self, graphes: Graphes):
+        """
+        Fonction qui permet de mettre à jour les données de la table
+        """
+
+        temp = []
+        temp.append("Marge")
+
+        i = 1
+        for element in graphes.grapheDict:
+            if int(element["tache"]) == int(self.table[0][i]):
+                temp.append(element["marge"])
+            i += 1
+
+        self.table.append(temp)
+        self.remove_data()
+
+        self.init_colonne()
+
+        for i in range(1, len(self.table)):
+            self.tableau_graphes.insert(parent="", index="end", values=self.table[i])
+
+        for i in range(len(self.tableau_graphes["columns"])):
+            self.tableau_graphes.column("#" + str(i + 1), minwidth=25, stretch=True, anchor=tk.CENTER)
+
+
+
+
+
+

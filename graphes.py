@@ -30,6 +30,7 @@ class Graphes:
         self.tache = []
         self.duree = []
         self.contraintes = []
+        self.graphe_to_table = []
         self.onlyOneEntreeAndSortie = False
         self.dontHaveCircuit = True
         self.dontHaveNegativeDuration = True
@@ -38,7 +39,8 @@ class Graphes:
         self.setGrapheDict()
         self.setType()
         self.setAlphaOmega()
-        self.checkNegativeDuration()
+
+        self.getValueMatrix()
 
     def setTaskDureeContraintes(self):
         """
@@ -255,11 +257,20 @@ class Graphes:
                     temp.append(" * ")
             matrix.rows.append(temp)
 
+
         headers = []
         for element in self.grapheDict:
             headers.append(" " + element["tache"] + " ")
         matrix.columns.header = headers
         matrix.rows.header = headers
+
+        self.graphe_to_table = str(matrix).split("\n")
+        self.graphe_to_table = [row.strip().split('|') for row in self.graphe_to_table if not row.startswith('+')]
+        self.graphe_to_table[0] = self.graphe_to_table[0][1:]
+        for i in range(1, len(self.graphe_to_table)):
+            self.graphe_to_table[i] = [col.strip() for col in self.graphe_to_table[i] if col.strip()]
+        self.graphe_to_table = [row for row in self.graphe_to_table if row]
+
         return matrix
 
     # todo: faire la fonction qui renvoie les chemins critiques (plusieurs chemins possibles) => arbres
@@ -356,6 +367,7 @@ if __name__ == '__main__':
     graphe = Graphes("test6.txt")
 
     graphe.checkCircuit()
+    graphe.checkNegativeDuration()
 
     graphe.setRang()
     graphe.setdateASAP()
