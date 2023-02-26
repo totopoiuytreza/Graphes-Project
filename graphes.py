@@ -76,7 +76,7 @@ class Graphes:
                             "rang": 0,
                             "dateASAP": 0,
                             "dateALAP": 0,
-                            "marge": 0
+                            "marge": None
                             }] + self.grapheDict
 
         self.grapheDict.append(
@@ -88,7 +88,7 @@ class Graphes:
              "rang": 0,
              "dateASAP": 0,
              "dateALAP": 0,
-             "marge": 0
+             "marge": None
              })
 
         for element in self.grapheDict:
@@ -195,7 +195,7 @@ class Graphes:
                                     "rang": 0,
                                     "dateASAP": 0,
                                     "dateALAP": 0,
-                                    "marge": 0})
+                                    "marge": None})
 
     def checkEntreeSortie(self):
         """
@@ -248,6 +248,7 @@ class Graphes:
         """
 
         matrix = beautifultable.BeautifulTable()
+        matrix.maxwidth = 100
         for element in self.grapheDict:
             temp = []
             for element2 in self.grapheDict:
@@ -260,9 +261,11 @@ class Graphes:
 
         headers = []
         for element in self.grapheDict:
-            headers.append(" " + element["tache"] + " ")
+            headers.append(element["tache"])
         matrix.columns.header = headers
         matrix.rows.header = headers
+
+
 
         self.graphe_to_table = str(matrix).split("\n")
         self.graphe_to_table = [row.strip().split('|') for row in self.graphe_to_table if not row.startswith('+')]
@@ -270,6 +273,8 @@ class Graphes:
         for i in range(1, len(self.graphe_to_table)):
             self.graphe_to_table[i] = [col.strip() for col in self.graphe_to_table[i] if col.strip()]
         self.graphe_to_table = [row for row in self.graphe_to_table if row]
+
+
 
         return matrix
 
@@ -364,22 +369,24 @@ class Graphes:
 
 if __name__ == '__main__':
     # Tests de la classe locale
-    graphe = Graphes("test6.txt")
+    graphe = Graphes("table 1.txt")
 
+    print(graphe.getValueMatrix())
     graphe.checkCircuit()
     graphe.checkNegativeDuration()
 
-    graphe.setRang()
+
+    """graphe.setRang()
     graphe.setdateASAP()
     graphe.setdateALAP()
     graphe.setMarge()
     graphes = graphe.getValueMatrix()
 
-    criticalPath = graphe.getCriticalPath()
+    criticalPath = graphe.getCriticalPath()"""
     """for element in graphe.grapheDict:
         print(element)"""
 
-    print(criticalPath)
+    #print(criticalPath)
 
     # print(graphe.onlyOneEntreeAndSortie)
     # print(graphe.dontHaveCircuit)

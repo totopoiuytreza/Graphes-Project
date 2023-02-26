@@ -237,7 +237,6 @@ class AppGraphe(tk.Tk):
         self.page_info_graphe_arc_verif_value.config(text="Not Verified", image="")
 
 
-    #TODO
     def showGraphe(self):
         """
         Fonction permettant d'afficher le graphe
