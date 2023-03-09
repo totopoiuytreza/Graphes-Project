@@ -220,7 +220,8 @@ class AppGraphe(tk.Tk):
             self.graphe_courant.setRang()
             self.graphe_courant.setdateASAP()
             self.graphe_courant.setdateALAP()
-            self.graphe_courant.setMarge()
+            self.graphe_courant.setMargeTotale()
+            self.graphe_courant.setMargeLibre()
             self.page_tableau_treeview.set_Rank(self.graphe_courant)
             self.page_tableau_treeview.set_dateASAP(self.graphe_courant)
             self.page_tableau_treeview.set_dateALAP(self.graphe_courant)
@@ -245,12 +246,6 @@ class AppGraphe(tk.Tk):
         if graph.check:
             print("Graphviz est installé")
             print(graph.graphe_to_graph(self.graphe_courant, visualiser=True))
-
-
-
-
-
-
 
 
 

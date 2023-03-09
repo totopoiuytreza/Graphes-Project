@@ -76,7 +76,8 @@ class Graphes:
                             "rang": 0,
                             "dateASAP": 0,
                             "dateALAP": 0,
-                            "marge": None
+                            "margeTotale": None,
+                            "margeLibre": None
                             }] + self.grapheDict
 
         self.grapheDict.append(
@@ -88,7 +89,8 @@ class Graphes:
              "rang": 0,
              "dateASAP": 0,
              "dateALAP": 0,
-             "marge": None
+             "margeTotale": None,
+             "margeLibre": None
              })
 
         for element in self.grapheDict:
@@ -175,12 +177,30 @@ class Graphes:
                                     element["dateALAP"] = element2["dateALAP"] - int(element["duree"])
             k -= 1
 
-    def setMarge(self):
+    def setMargeTotale(self):
         """
         Set la marge de chaque tâche
         """
         for element in self.grapheDict:
-            element["marge"] = element["dateALAP"] - element["dateASAP"]
+            element["margeTotale"] = element["dateALAP"] - element["dateASAP"]
+
+    def setMargeLibre(self):
+        """
+        Set la marge libre de chaque tâche
+        """
+        for element in self.grapheDict:
+            if element["rang"] == 0:
+                element["margeLibre"] = 0
+            else:
+                temp = []
+                for element2 in self.grapheDict:
+                    if element["tache"] in element2["contraintes"]:
+                        temp.append(element2["dateASAP"])
+                if not temp:
+                    element["margeLibre"] = 0
+                else:
+                    element["margeLibre"] = min(temp) - element["dateASAP"] - int(element["duree"])
+
 
     def setGrapheDict(self):
         """
@@ -195,7 +215,8 @@ class Graphes:
                                     "rang": 0,
                                     "dateASAP": 0,
                                     "dateALAP": 0,
-                                    "marge": None})
+                                    "margeTotale": None,
+                                    "margeLibre": None})
 
     def checkEntreeSortie(self):
         """
@@ -287,7 +308,7 @@ class Graphes:
         temp = []
         #Get all the tasks with a margin of 0
         for element in self.grapheDict:
-            if element["marge"] == 0:
+            if element["margeTotale"] == 0:
                 temp.append(element["tache"])
 
         dupe = self.checkDupeRank(temp)
@@ -379,7 +400,8 @@ if __name__ == '__main__':
     """graphe.setRang()
     graphe.setdateASAP()
     graphe.setdateALAP()
-    graphe.setMarge()
+    graphe.setMargeTotale()
+    graphe.setMargeLibre()
     graphes = graphe.getValueMatrix()
 
     criticalPath = graphe.getCriticalPath()"""

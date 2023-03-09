@@ -180,15 +180,19 @@ class Sheet:
         """
 
         temp = []
-        temp.append("Marge")
+        temp2 = []
+        temp.append("MargeT")
+        temp2.append("MargeL")
 
         i = 1
         for element in graphes.grapheDict:
             if int(element["tache"]) == int(self.table[0][i]):
-                temp.append(element["marge"])
+                temp.append(element["margeTotale"])
+                temp2.append(element["margeLibre"])
             i += 1
 
         self.table.append(temp)
+        self.table.append(temp2)
         self.remove_data()
 
         self.init_colonne()
