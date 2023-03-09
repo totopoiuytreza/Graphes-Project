@@ -54,7 +54,7 @@ class ToGraphviz:
 
         # On parcourt tous les états du graphe et on crée les nodes graphviz correspondants.
         for sommet in graphes.grapheDict:
-            if sommet["marge"] == 0:
+            if sommet["margeTotale"] == 0:
                 gra.attr('node', color='red')
             else:
                 gra.attr('node', color='black')
@@ -68,7 +68,7 @@ class ToGraphviz:
             for successeur in sommet["contraintes"]:
                 for element in graphes.grapheDict:
                     if element["tache"] == successeur:
-                        if element["marge"] == 0 and sommet["marge"] == 0:
+                        if element["margeTotale"] == 0 and sommet["margeTotale"] == 0:
                             gra.attr('edge', color='red')
                         else:
                             gra.attr('edge', color='black')
