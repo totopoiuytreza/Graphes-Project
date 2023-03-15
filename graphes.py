@@ -299,42 +299,87 @@ class Graphes:
 
         return matrix
 
-    # todo: faire la fonction qui renvoie les chemins critiques (plusieurs chemins possibles) => arbres
+    def removeNotZeroMarge(self, graphe):
+        """
+        Supprime les tâches qui n'ont pas de marge de 0
+        """
+        zeroMarge = False
+        while not zeroMarge:
+            for element in graphe.grapheDict:
+                if element["margeTotale"] != 0:
+                    graphe.grapheDict.remove(element)
+            for element in graphe.grapheDict:
+                if element["margeTotale"] == 0:
+                    zeroMarge = True
+                else:
+                    zeroMarge = False
+                    break
+        return graphe
+
+
+    #todo
+    def inDepthSearch(self, graphe):
+        """
+        Renvoie une liste du parcours en profondeur du graphe
+        """
+        temp = []
+        traversalList = []
+        visited = []
+        for element in graphe.grapheDict:
+            visited.append([element["tache"], False])
+        visitedAll = False
+
+        k = 0 #rang
+        while not visitedAll:
+            while k <= self.getHighestRank(visited)[0]:
+                for element in graphe.grapheDict:
+                    i = None
+                    if element["rang"] == k:
+                        for element2 in visited:
+                            if element["tache"] in element2[0]:
+                                i = visited.index(element2)
+                                break
+                        if not visited[i][1]:
+                            if not temp:
+                                temp.append(element["tache"])
+                                visited[i][1]  = True
+                                graphe.grapheDict.remove(element)
+                            else:
+                                if element["tache"] not in temp:
+                                    if temp[-1] in element["contraintes"]:
+                                        temp.append(element["tache"])
+                                        visited[i][1]  = True
+                                        graphe.grapheDict.remove(element)
+                k += 1
+            visited = []
+            traversalList.append(temp)
+            temp = []
+            k = 0
+            for element in graphe.grapheDict:
+                visited.append([element["tache"], False])
+            if not visited:
+                visitedAll = True
+
+        return traversalList
+
+
+    # todo: faire la fonction qui renvoie les chemins critiques (plusieurs chemins possibles) => parcours en profondeur
     def getCriticalPath(self):
         """
         Renvoie le(s) chemin(s) critique(s)
         """
-        paths = []
-        temp = []
-        #Get all the tasks with a margin of 0
-        for element in self.grapheDict:
-            if element["margeTotale"] == 0:
-                temp.append(element["tache"])
+        newGraphe = self.__copy__()
+        newGraphe.setRang()
+        newGraphe.setdateASAP()
+        newGraphe.setdateALAP()
+        newGraphe.setMargeTotale()
 
-        dupe = self.checkDupeRank(temp)
-
-        if not dupe:
-            return self.findPath(temp)
-
-        while temp and dupe:
-            path = self.findPath(temp)
-            paths.append(path)
-
-            self.remove_path(path, temp, dupe)
+        newGraphe = self.removeNotZeroMarge(newGraphe)
+        criticalPath = self.inDepthSearch(newGraphe)
 
 
-        return paths
+        return criticalPath
 
-    def findPath(self, temp):
-        path = []
-        k = 0
-        while k <= self.grapheDict[-1]["rang"]:
-            for element in self.grapheDict:
-                if element["rang"] == k and element["tache"] in temp:
-                    path.append(element["tache"])
-                    break
-            k += 1
-        return path
     def getHighestRank(self, temp):
         """
         Renvoie le rang le plus haut
@@ -343,37 +388,10 @@ class Graphes:
         stop_condition = 0
         for i in range(len(temp)):
             for element in self.grapheDict:
-                if element["tache"] == temp[i] and stop_condition < element["rang"]:
+                if element["tache"] == temp[i][0] and stop_condition < element["rang"]:
                     stop_condition = element["rang"]
                     task = element["tache"]
         return stop_condition, task
-
-    def checkDupeRank(self, temp):
-        dupe_rank = []
-        for element in self.grapheDict:
-            if element["tache"] in temp:
-                dupe_rank.append(element["rang"])
-        dupe_rank = list(set([i for i in dupe_rank if dupe_rank.count(i) >= 2]))
-        return dupe_rank
-
-    def remove_path(self, path, temp, dupe):
-
-        highest_rank_task = self.getHighestRank(path)
-        while highest_rank_task[0] not in dupe:
-            highest_rank_task = self.getHighestRank(path)
-            for element in self.grapheDict:
-                if element["tache"] == highest_rank_task[1]:
-                    temp.remove(element["tache"])
-                    path.remove(element["tache"])
-
-        highest_rank_task = self.getHighestRank(path)
-        for element in self.grapheDict:
-            if element["tache"] == highest_rank_task[1]:
-                temp.remove(element["tache"])
-                path.remove(element["tache"])
-
-
-
 
 
     def __copy__(self):
@@ -382,7 +400,6 @@ class Graphes:
         """
         newGraphe = Graphes(self.fichier.fichier)
         newGraphe.setTaskDureeContraintes()
-        newGraphe.setGrapheDict()
         newGraphe.setType()
         newGraphe.checkEntreeSortie()
         return newGraphe

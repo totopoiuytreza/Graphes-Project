@@ -222,6 +222,7 @@ class AppGraphe(tk.Tk):
             self.graphe_courant.setdateALAP()
             self.graphe_courant.setMargeTotale()
             self.graphe_courant.setMargeLibre()
+            self.graphe_courant.getCriticalPath()
             self.page_tableau_treeview.set_Rank(self.graphe_courant)
             self.page_tableau_treeview.set_dateASAP(self.graphe_courant)
             self.page_tableau_treeview.set_dateALAP(self.graphe_courant)
