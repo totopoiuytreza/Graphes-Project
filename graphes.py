@@ -317,7 +317,6 @@ class Graphes:
         return graphe
 
 
-    #todo
     def inDepthSearch(self, graphe):
         """
         Renvoie une liste du parcours en profondeur du graphe
@@ -363,7 +362,6 @@ class Graphes:
         return traversalList
 
 
-    # todo: faire la fonction qui renvoie les chemins critiques (plusieurs chemins possibles) => parcours en profondeur
     def getCriticalPath(self):
         """
         Renvoie le(s) chemin(s) critique(s)
