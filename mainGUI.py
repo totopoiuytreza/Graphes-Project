@@ -105,6 +105,8 @@ class AppGraphe(tk.Tk):
         self.page_info_graphe_circuit_verif_value = tk.Label(master=self.page_info, text="Not Verified", bg="white", fg="black", font=("Arial", 10))
         self.page_info_graphe_arc_verif = tk.Label(master=self.page_info, text="Pas d'arcs négatifs: ", bg="white", fg="black", font=("Arial", 10))
         self.page_info_graphe_arc_verif_value = tk.Label(master=self.page_info, text="Not Verified", bg="white", fg="black", font=("Arial", 10))
+        self.page_info_graphe_critical_path = tk.Label(master=self.page_info, text="Chemin critique: ", bg="white", fg="black", font=("Arial", 10))
+        self.page_info_graphe_critical_path_value = tk.Label(master=self.page_info, text="Not Calculated", bg="white", fg="black", font=("Arial", 10))
 
         #Creation de la page choix des graphes
         self.page_choix.grid_propagate(False)
@@ -153,6 +155,8 @@ class AppGraphe(tk.Tk):
         self.page_info_graphe_circuit_verif_value.grid(row=2, column=1, sticky="nw")
         self.page_info_graphe_arc_verif.grid(row=3, column=0, sticky="nw")
         self.page_info_graphe_arc_verif_value.grid(row=3, column=1, sticky="nw")
+        self.page_info_graphe_critical_path.grid(row=4, column=0, sticky="nw")
+        self.page_info_graphe_critical_path_value.grid(row=4, column=1, sticky="nw")
 
         # Placement dans la page choix des graphes
         self.page_choix_combobox.grid(row=1, column=0, sticky="nw", padx=5)
@@ -227,6 +231,7 @@ class AppGraphe(tk.Tk):
             self.page_tableau_treeview.set_dateASAP(self.graphe_courant)
             self.page_tableau_treeview.set_dateALAP(self.graphe_courant)
             self.page_tableau_treeview.set_marge(self.graphe_courant)
+            self.page_info_graphe_critical_path_value.config(text=self.graphe_courant.getCriticalPath())
 
 
 
@@ -237,6 +242,7 @@ class AppGraphe(tk.Tk):
         """
         self.page_info_graphe_circuit_verif_value.config(text="Not Verified", image="")
         self.page_info_graphe_arc_verif_value.config(text="Not Verified", image="")
+        self.page_info_graphe_critical_path_value.config(text="Not Calculated")
 
 
     def showGraphe(self):
