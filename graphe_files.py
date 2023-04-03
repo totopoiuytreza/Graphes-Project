@@ -5,7 +5,7 @@ Projet Théorie des graphes L3 EFREI
     - Nathan RICARDO
     - Thomas SONG
     -
-Gestion des fichiers permettant de conserver les automates.
+Gestion des fichiers permettant de conserver les graphes.
 """
 
 import os
@@ -24,7 +24,7 @@ class GraphesNotFound(Error):
 class Lecture:
     def __init__(self, fichier):
         """
-        Cette classe permet de lire un fichier automate pour les gérer dans les classes qui l'exploitent.
+        Cette classe permet de lire un fichier graphe pour les gérer dans les classes qui l'exploitent.
 
         :param fichier: Le nom du fichier à ouvrir, présent dans le répertoire par défaut du projet.
         """

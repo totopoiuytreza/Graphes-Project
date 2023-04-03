@@ -18,7 +18,7 @@ class Configuration:
         On vient mettre en place les constantes du projet.
         """
 
-        # Path vers le répertoire des automates par défaut.
+        # Path vers le répertoire des graphes par défaut.
         self.graphes_path = os.path.join(os.path.dirname(__file__), "graphes")
         # Path vers les ressources images
         self.ressources_path = os.path.join(os.path.dirname(__file__), "ressources")

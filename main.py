@@ -14,8 +14,8 @@ from graphe_files import Lecture
 
 if __name__ == '__main__':
     """
-    appAutomate = Gui.AppAutomate()
-    appAutomate.title("Gestion des Automates. EFREI L2")
+    appGraphes = Gui.AppGraphes()
+    appGraphes.title("Gestion des Graphes. EFREI L3")
 
-    appAutomate.mainloop()
+    appGraphes.mainloop()
     """

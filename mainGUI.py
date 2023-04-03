@@ -48,7 +48,7 @@ class AppGraphe(tk.Tk):
 
         self.liste_graphes: list | None = None
 
-        # Automate en cours de traitement et d'affichage.
+        # Graphe en cours de traitement et d'affichage.
         self.graphe_courant: Graphes | None = None
 
         #Image utilisée dans l'application
