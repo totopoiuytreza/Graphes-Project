@@ -1,7 +1,7 @@
 """
 Projet Théorie des graphes L3 EFREI
-    -
-    -
+    - Yann SCARDIGLI
+    - Pierre THAITE
     - Nathan RICARDO
     - Thomas SONG
     -
