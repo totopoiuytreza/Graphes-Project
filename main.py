@@ -13,9 +13,7 @@ import mainGUI as Gui
 from graphe_files import Lecture
 
 if __name__ == '__main__':
-    """
-    appGraphes = Gui.AppGraphes()
+    appGraphes = Gui.AppGraphe()
     appGraphes.title("Gestion des Graphes. EFREI L3")
 
     appGraphes.mainloop()
-    """
