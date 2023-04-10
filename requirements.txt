@@ -1,0 +1,8 @@
+Pour lancer le programme, il faut lancer le :
+- main.py 
+
+Les librairies requises sont :
+- beautifultable (pip install beautifultable)
+- graphviz (pip install graphiviz ET installer depuis internet)
+
+

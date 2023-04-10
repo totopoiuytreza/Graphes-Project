@@ -20,6 +20,7 @@ from graphes import Graphes
 from Sheet import Sheet
 from visual_graphe import ToGraphviz
 from config import Configuration
+from execution_file import execution_trace
 
 
 class AppGraphe(tk.Tk):
@@ -129,6 +130,9 @@ class AppGraphe(tk.Tk):
         self.page_boutons_affiche_graphe = tk.Button(master=self.page_boutons, text="Show the graphe", bg="white", fg="black", font=("Arial", 10),
                                                      command=lambda: self.showGraphe())
         self.page_boutons_affiche_graphe.configure(state="disabled")
+        self.page_boutons_trace = tk.Button(master=self.page_boutons, text="Trace", bg="white", fg="black", font=("Arial", 10),
+                                            command=lambda: self.trace())
+
 
 
         # Placement des pages
@@ -168,6 +172,7 @@ class AppGraphe(tk.Tk):
         #Placement dans la page choix des boutons
         self.page_boutons_ordonnancement_verif.grid(row=1, column=0, sticky="nw", padx=5, pady=5)
         self.page_boutons_affiche_graphe.grid(row=2, column=0, sticky="nw", padx=5, pady=5)
+        self.page_boutons_trace.grid(row=3, column=0, sticky="nw", padx=5, pady=5)
 
 
     def choose_path(self):
@@ -254,6 +259,11 @@ class AppGraphe(tk.Tk):
             print("Graphviz est installé")
             print(graph.graphe_to_graph(self.graphe_courant, visualiser=True))
 
+    def trace(self):
+        """
+        Fonction permettant d'avoir les traces de tout les graphes du repertoire
+        """
+        execution_trace()
 
 
 

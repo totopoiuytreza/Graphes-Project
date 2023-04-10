@@ -263,11 +263,10 @@ class Graphes:
             if int(element["duree"]) < 0:
                 self.dontHaveNegativeDuration = False
 
-    def getValueMatrix(self):
+    def getMatrixBeautifulTable(self):
         """
-        Renvoie la matrice des valeurs
+        Renvoie la matrice du graphe sous forme de tableau
         """
-
         matrix = beautifultable.BeautifulTable()
         matrix.maxwidth = 100
         for element in self.grapheDict:
@@ -279,14 +278,54 @@ class Graphes:
                     temp.append(" * ")
             matrix.rows.append(temp)
 
-
         headers = []
         for element in self.grapheDict:
             headers.append(element["tache"])
         matrix.columns.header = headers
         matrix.rows.header = headers
 
+        return matrix
 
+    def getMatrix_withAllData(self):
+        """
+        Renvoie la matrice du graphe sous forme de tableau
+        """
+        matrix = beautifultable.BeautifulTable()
+        matrix.maxwidth = 1000
+        for element in self.grapheDict:
+            temp = []
+            for element2 in self.grapheDict:
+                if element["tache"] in element2["contraintes"]:
+                    temp.append(element["tache"])
+                else:
+                    temp.append(" * ")
+            temp.append(element["rang"])
+            temp.append(element["dateASAP"])
+            temp.append(element["dateALAP"])
+            temp.append(element["margeTotale"])
+            temp.append(element["margeLibre"])
+            matrix.rows.append(temp)
+
+        headers = []
+        row_headers = []
+        for element in self.grapheDict:
+            headers.append(element["tache"])
+        row_headers = headers.copy()
+        headers.append("rang")
+        headers.append("dateASAP")
+        headers.append("dateALAP")
+        headers.append("margeTotale")
+        headers.append("margeLibre")
+        matrix.columns.header = headers
+        matrix.rows.header = row_headers
+
+        return matrix
+
+    def getValueMatrix(self):
+        """
+        Renvoie la matrice des valeurs
+        """
+        matrix = self.getMatrixBeautifulTable()
 
         self.graphe_to_table = str(matrix).split("\n")
         self.graphe_to_table = [row.strip().split('|') for row in self.graphe_to_table if not row.startswith('+')]
