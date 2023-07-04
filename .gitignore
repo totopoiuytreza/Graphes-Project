@@ -1,0 +1,11 @@
+# IDE's project files
+.idea
+
+# Pycache
+__pycache__
+
+# Build generated
+build\main
+
+
+
